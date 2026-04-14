@@ -46,3 +46,18 @@ Thumbs.db
 .claude/worktrees
 .claude/settings.local.json
 .nx/polygraph
+vite.config.*.timestamp*
+test-output
+
+# AI & IDE Configs
+.agents/
+.apps/
+.claude/
+.codex/
+.cursor/
+.gemini/
+
+# Nx & Other tools
+.nx/
+.env
+.vscode/extensions.json

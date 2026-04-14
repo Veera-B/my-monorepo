@@ -1,0 +1,13 @@
+{
+    "name":"auth-service",
+    "projectType":"application",
+    "sourceRoot": "apps/micro-services/auth-service",
+    "targets": {
+        "serve":{
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "python apps/micro-services/auth-service/main.py"
+            }
+        }
+    }
+}
