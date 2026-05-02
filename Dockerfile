@@ -10,7 +10,7 @@ RUN npx nx build auth-portal --prod --verbose
 RUN ls -la
 RUN ls -R apps/micro-frontends/auth-portal/dist || ls -R dist
 
-# --- STAGE 2: Build Backend & Final Image ---
+# --- STAGE 2: Build Backend & Final Image   ---
 FROM python:3.11-slim
 WORKDIR /app
 
