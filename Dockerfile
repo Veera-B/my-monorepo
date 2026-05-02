@@ -2,10 +2,11 @@
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --include=dev
 COPY . .
 # auth-portal ని బిల్డ్ చేయడం
-RUN npx nx build auth-portal --prod --outputPath=dist/auth-portal
+ENV NODE_OPTIONS=--max-old-space-size=4096
+RUN npx nx build auth-portal --prod --verbose
 RUN ls -la
 RUN ls -R apps/micro-frontends/auth-portal/dist || ls -R dist
 
