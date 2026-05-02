@@ -26,7 +26,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY apps/micro-services/auth-service/ ./
 
 # Frontend బిల్డ్ ఫైల్స్ ని Nginx ఫోల్డర్‌లోకి కాపీ చేయడం
-COPY --from=frontend-builder /app/dist/auth-portal /usr/share/nginx/html
+# పాత లైన్ ని తీసేసి ఇది పెట్టు:
+COPY --from=frontend-builder /app/apps/micro-frontends/auth-portal/dist /usr/share/nginx/html
 # Nginx కాన్ఫిగరేషన్ (Frontend ని 80 పోర్ట్ మీద రన్ చేయడానికి)
 RUN echo 'server { \
     listen 80; \
