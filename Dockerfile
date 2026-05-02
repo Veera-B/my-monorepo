@@ -14,7 +14,7 @@ RUN ls -R apps/micro-frontends/auth-portal/dist || ls -R dist
 FROM python:3.11-slim
 WORKDIR /app
 
-# కంటైనర్ లోపల అవసరమైన సాఫ్ట్‌వేర్ (Nginx) ఇన్‌స్టాల్ చేయడం
+# కంటైనర్ లోపల అవసరమైన సాఫ్ట్‌వేర్ (Nginx)   ఇన్‌స్టాల్ చేయడం
 RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
 
 # Backend dependencies ఇన్‌స్టాల్ చేయడం

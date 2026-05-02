@@ -41,7 +41,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'monodev' # నీ అజూర్ వెబ్ యాప్ పేరు
-          images: 'monorepodevacr.azurecr.io/monodev-app:${{ github.sha }}'
+          images: monorepodevacr.azurecr.io/monodev-app:latest
 
       # 4. (Optional) ఇమేజ్ కి 'latest' ట్యాగ్ అప్‌డేట్ చేయడం
       - name: 'Update Latest Tag'
