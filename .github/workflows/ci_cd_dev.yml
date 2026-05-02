@@ -1,0 +1,46 @@
+name: Monorepo CI-CD (Single Repo)
+
+on:
+  push:
+    branches:
+      - dev
+    # కేవలం ఈ ఫోల్డర్లలో మార్పులు జరిగినప్పుడే పైప్‌లైన్ రన్ అవుతుంది
+    paths:
+      - 'apps/**'
+      - 'libs/**'
+      - 'Dockerfile'
+      - 'package.json'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Code'
+        uses: actions/checkout@v4
+
+      # 1. Azure ACR కి లాగిన్ అవ్వడం
+      - name: 'Login to Azure Container Registry'
+        uses: azure/docker-login@v2
+        with:
+          login-server: monorepodevacr.azurecr.io
+          username: ${{ secrets.AZURE_ACR_USERNAME }}
+          password: ${{ secrets.AZURE_ACR_PASSWORD }}
+
+      # 2. Docker Image బిల్డ్ చేయడం (Tag గా Git SHA వాడుతున్నాం)
+      - name: 'Build and Push Multi-stage Image'
+        run: |
+          docker build -t monorepodevacr.azurecr.io/monodev-app:${{ github.sha }} .
+          docker push monorepodevacr.azurecr.io/monodev-app:${{ github.sha }}
+
+      # 3. Azure Web App కి డిప్లాయ్ చేయడం
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'monodev' # నీ అజూర్ వెబ్ యాప్ పేరు
+          images: 'monorepodevacr.azurecr.io/monodev-app:${{ github.sha }}'
+
+      # 4. (Optional) ఇమేజ్ కి 'latest' ట్యాగ్ అప్‌డేట్ చేయడం
+      - name: 'Update Latest Tag'
+        run: |
+          docker tag monorepodevacr.azurecr.io/monodev-app:${{ github.sha }} monorepodevacr.azurecr.io/monodev-app:latest
+          docker push monorepodevacr.azurecr.io/monodev-app:latest
