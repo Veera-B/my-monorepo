@@ -3,7 +3,7 @@ name: Monorepo CI-CD (Single Repo)
 on:
   push:
     branches:
-      - dev
+      - monorepo-dev
     # కేవలం ఈ ఫోల్డర్లలో మార్పులు జరిగినప్పుడే పైప్‌లైన్ రన్ అవుతుంది
     paths:
       - 'apps/**'
