@@ -5,7 +5,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 # auth-portal ని బిల్డ్ చేయడం
-RUN npx nx build auth-portal --prod
+RUN npx nx build auth-portal --prod --outputPath=dist/auth-portal
 RUN ls -la
 RUN ls -R apps/micro-frontends/auth-portal/dist || ls -R dist
 
@@ -25,7 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY apps/micro-services/auth-service/ ./
 
 # Frontend బిల్డ్ ఫైల్స్ ని Nginx ఫోల్డర్‌లోకి కాపీ చేయడం
-COPY --from=frontend-builder /app/dist/apps/micro-frontends/auth-portal /usr/share/nginx/html
+COPY --from=frontend-builder /app/dist/auth-portal /usr/share/nginx/html
 # Nginx కాన్ఫిగరేషన్ (Frontend ని 80 పోర్ట్ మీద రన్ చేయడానికి)
 RUN echo 'server { \
     listen 80; \
