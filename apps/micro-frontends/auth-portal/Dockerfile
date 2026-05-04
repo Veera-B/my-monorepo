@@ -7,8 +7,8 @@ RUN npm install
 
 # పూర్తి కోడ్ కాపీ చేసి బిల్డ్ చేయడం
 COPY . .
-# Nx/Vite లో బిల్డ్ కమాండ్ రన్ చేస్తాం
-RUN npx vite build
+# ఒకవేళ నీ vite.config.ts రూట్ లో లేకపోతే, పాత్ కరెక్ట్ గా ఇవ్వాలి
+RUN npx vite build --base ./
 
 # రెండవ స్టేజ్: కేవలం బిల్డ్ అయిన ఫైల్స్ ని Nginx లో పెట్టడం 
 FROM nginx:stable-alpine
