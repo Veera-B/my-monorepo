@@ -31,12 +31,12 @@ jobs:
           docker push monorepodevacr.azurecr.io/auth-service:latest
 
       # 3. FRONTEND ఇమేజ్ బిల్డ్ చేయడం (auth-portal)
-      # - name: 'Build and Push Frontend Image'
-      #   run: |
-      #     docker build -t monorepodevacr.azurecr.io/auth-portal:${{ github.sha }} -f apps/micro-frontends/auth-portal/Dockerfile .
-      #     docker push monorepodevacr.azurecr.io/auth-portal:${{ github.sha }}
-      #     docker tag monorepodevacr.azurecr.io/auth-portal:${{ github.sha }} monorepodevacr.azurecr.io/auth-portal:latest
-      #     docker push monorepodevacr.azurecr.io/auth-portal:latest
+      - name: 'Build and Push Frontend Image'
+        run: |
+          docker build -t monorepodevacr.azurecr.io/auth-portal:${{ github.sha }} -f apps/micro-frontends/auth-portal/Dockerfile .
+          docker push monorepodevacr.azurecr.io/auth-portal:${{ github.sha }}
+          docker tag monorepodevacr.azurecr.io/auth-portal:${{ github.sha }} monorepodevacr.azurecr.io/auth-portal:latest
+          docker push monorepodevacr.azurecr.io/auth-portal:latest
 
       # 4. Azure కి లాగిన్
       - name: 'Azure Login'
@@ -52,3 +52,9 @@ jobs:
         with:
           app-name: 'monodev'
           images: monorepodevacr.azurecr.io/auth-service:latest
+      # 6. FRONTEND ని కొత్త వెబ్ యాప్ కి డిప్లాయ్ చేయడం
+      - name: 'Deploy Frontend to Azure Web App'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'auth-portal'
+          images: monorepodevacr.azurecr.io/auth-portal:latest

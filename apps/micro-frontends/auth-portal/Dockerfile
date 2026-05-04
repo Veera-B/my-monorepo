@@ -1,17 +1,19 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# కంటైనర్ లోపలికి ఫైల్స్ కాపీ చేయండి
+# Dependencies ఇన్స్టాలేషన్
 COPY package*.json ./
-
-# Nx ప్రాజెక్ట్ కాబట్టి ఇవన్నీ ఫోర్స్ గా ఇన్‌స్టాల్ చేద్దాం
 RUN npm install
-RUN npm install react react-dom @vitejs/plugin-react vite
 
+# పూర్తి కోడ్ కాపీ చేసి బిల్డ్ చేయడం
 COPY . .
+# Nx/Vite లో బిల్డ్ కమాండ్ రన్ చేస్తాం
+RUN npx vite build
 
-# tsconfig లేదని ఎర్రర్ రాకుండా ఒకవేళ అది వేరే పేరుతో ఉంటే (ఉదా: tsconfig.app.json) 
-# దాన్ని tsconfig.json గా లింక్ చేయాలి లేదా ఫైల్ అక్కడ ఉండేలా చూడాలి.
+# రెండవ స్టేజ్: కేవలం బిల్డ్ అయిన ఫైల్స్ ని Nginx లో పెట్టడం 
+FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
 
-EXPOSE 4200
-CMD ["npx", "vite", "--host", "--port", "4200"]
+# అజూర్ వెబ్ యాప్ కోసం పోర్ట్ 80
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
