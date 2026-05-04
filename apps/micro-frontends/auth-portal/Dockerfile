@@ -15,6 +15,8 @@ RUN npx vite build --base ./
 
 # Stage 2: Serve with Nginx
 FROM nginx:stable-alpine
+# ఈ ఒక్క లైన్ ని యాడ్ చెయ్యి - ఇది Nginx కి రూటింగ్ ఎలా చేయాలో చెబుతుంది
+RUN echo 'server { listen 80; location / { root /usr/share/nginx/html; index index.html; try_files $uri $uri/ /index.html; } }' > /etc/nginx/conf.d/default.conf
 # బిల్డ్ అయిన ఫైల్స్ సాధారణంగా ఆ ఫోల్డర్ లోని 'dist' లో ఉంటాయి
 COPY --from=build /app/apps/micro-frontends/auth-portal/dist /usr/share/nginx/html
 EXPOSE 80
