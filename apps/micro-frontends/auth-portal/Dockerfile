@@ -1,3 +1,4 @@
+# Stage 1: Build
 FROM node:20-alpine AS build
 WORKDIR /app
 
@@ -5,15 +6,16 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# పూర్తి కోడ్ కాపీ చేసి బిల్డ్ చేయడం
+# పూర్తి కోడ్ కాపీ చేయడం
 COPY . .
-# ఒకవేళ నీ vite.config.ts రూట్ లో లేకపోతే, పాత్ కరెక్ట్ గా ఇవ్వాలి
+
+# ఇక్కడ మార్పు ఉంది: బిల్డ్ చేసే ముందు ఆ ఫోల్డర్ లోకి వెళ్ళాలి
+WORKDIR /app/apps/micro-frontends/auth-portal
 RUN npx vite build --base ./
 
-# రెండవ స్టేజ్: కేవలం బిల్డ్ అయిన ఫైల్స్ ని Nginx లో పెట్టడం 
+# Stage 2: Serve with Nginx
 FROM nginx:stable-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# అజూర్ వెబ్ యాప్ కోసం పోర్ట్ 80
+# బిల్డ్ అయిన ఫైల్స్ సాధారణంగా ఆ ఫోల్డర్ లోని 'dist' లో ఉంటాయి
+COPY --from=build /app/apps/micro-frontends/auth-portal/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
