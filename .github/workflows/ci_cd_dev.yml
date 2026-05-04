@@ -1,15 +1,11 @@
-name: Monorepo CI-CD (Single Repo)
+name: Monorepo CI-CD (Multi-Container)
 
 on:
   push:
     branches:
       - monorepo-dev
-    # కేవలం ఈ ఫోల్డర్లలో మార్పులు జరిగినప్పుడే పైప్‌లైన్ రన్ అవుతుంది
     paths:
       - 'apps/**'
-      - 'libs/**'
-      - 'Dockerfile'
-      - 'package.json'
 
 jobs:
   build-and-deploy:
@@ -18,7 +14,7 @@ jobs:
       - name: 'Checkout Code'
         uses: actions/checkout@v4
 
-      # 1. Azure ACR కి లాగిన్ అవ్వడం
+      # 1. Azure ACR కి లాగిన్ (ఇది అలాగే ఉంటుంది)
       - name: 'Login to Azure Container Registry'
         uses: azure/docker-login@v2
         with:
@@ -26,25 +22,33 @@ jobs:
           username: ${{ secrets.AZURE_ACR_USERNAME }}
           password: ${{ secrets.AZURE_ACR_PASSWORD }}
 
-      # 2. Docker Image బిల్డ్ చేయడం (Tag గా Git SHA వాడుతున్నాం)
-      - name: 'Build and Push Multi-stage Image'
+      # 2. BACKEND ఇమేజ్ బిల్డ్ చేయడం (auth-service)
+      - name: 'Build and Push Backend Image'
         run: |
-          docker build -t monorepodevacr.azurecr.io/monodev-app:${{ github.sha }} .
-          docker push monorepodevacr.azurecr.io/monodev-app:${{ github.sha }}
-        
-      - name: 'Azure cred Login '
+          docker build -t monorepodevacr.azurecr.io/auth-service:${{ github.sha }} -f apps/micro-services/auth-service/Dockerfile .
+          docker push monorepodevacr.azurecr.io/auth-service:${{ github.sha }}
+          docker tag monorepodevacr.azurecr.io/auth-service:${{ github.sha }} monorepodevacr.azurecr.io/auth-service:latest
+          docker push monorepodevacr.azurecr.io/auth-service:latest
+
+      # 3. FRONTEND ఇమేజ్ బిల్డ్ చేయడం (auth-portal)
+      # - name: 'Build and Push Frontend Image'
+      #   run: |
+      #     docker build -t monorepodevacr.azurecr.io/auth-portal:${{ github.sha }} -f apps/micro-frontends/auth-portal/Dockerfile .
+      #     docker push monorepodevacr.azurecr.io/auth-portal:${{ github.sha }}
+      #     docker tag monorepodevacr.azurecr.io/auth-portal:${{ github.sha }} monorepodevacr.azurecr.io/auth-portal:latest
+      #     docker push monorepodevacr.azurecr.io/auth-portal:latest
+
+      # 4. Azure కి లాగిన్
+      - name: 'Azure Login'
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
-      # 3. Azure Web App కి డిప్లాయ్ చేయడం
-      - name: 'Deploy to Azure Web App'
+
+      # 5. ఇక్కడ ఒక చిన్న ట్విస్ట్! 
+      # నువ్వు ప్రస్తుతానికి ఒకే వెబ్ యాప్ (monodev) వాడుతున్నావు కాబట్టి, 
+      # ముందుగా మనం బ్యాకెండ్‌ని టెస్ట్ చేయడానికి దాని ఇమేజ్‌ని పుష్ చేద్దాం.
+      - name: 'Deploy Backend to Azure Web App'
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'monodev' # నీ అజూర్ వెబ్ యాప్ పేరు
-          images: monorepodevacr.azurecr.io/monodev-app:latest
-
-      # 4. (Optional) ఇమేజ్ కి 'latest' ట్యాగ్ అప్‌డేట్ చేయడం
-      - name: 'Update Latest Tag'
-        run: |
-          docker tag monorepodevacr.azurecr.io/monodev-app:${{ github.sha }} monorepodevacr.azurecr.io/monodev-app:latest
-          docker push monorepodevacr.azurecr.io/monodev-app:latest
+          app-name: 'monodev'
+          images: monorepodevacr.azurecr.io/auth-service:latest
