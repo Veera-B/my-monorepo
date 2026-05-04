@@ -13,7 +13,7 @@ COPY . .
 WORKDIR /app/apps/micro-frontends/auth-portal
 
 # ఇక్కడ Vite కి స్పష్టంగా root పాత్ ఇదేనని చెబుతున్నాం
-RUN npx vite build --root . --base ./
+RUN npx vite build . --base ./
 
 # Stage 2: Serve with Nginx
 FROM nginx:stable-alpine
