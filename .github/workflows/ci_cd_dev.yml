@@ -1,4 +1,4 @@
-name: Main CI Orchestrator for Monorepo CI-CD (Single Repo)
+name: Main CI Orchestrator
 
 on:
   push:
@@ -6,17 +6,35 @@ on:
       - monorepo-dev
     paths:
       - 'apps/**'
+
 jobs:
-  # If any changes happened in Auth-Portal then this job will runs
+  # 1. ఏ ఫోల్డర్ లో మార్పులు జరిగాయో కనిపెట్టే జాబ్
+  Changes-Detector:
+    runs-on: ubuntu-latest
+    outputs:
+      auth-portal: ${{ steps.filter.outputs.auth-portal }}
+      auth-service: ${{ steps.filter.outputs.auth-service }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            auth-portal:
+              - 'apps/micro-frontends/auth-portal/**'
+            auth-service:
+              - 'apps/micro-services/auth-service/**'
+
+  # 2. Auth Portal Flow (పైన ఉన్న రిజల్ట్ ని బట్టి రన్ అవుతుంది)
   Auth-Portal-Flow:
-    if: contains(github.event.head_commit.modified,'apps/micro-frontend/auth-portal') || contains(github.event.head_commit.added,'apps/micro-frontend/auth-portal')
-    uses: ./.github/workflows/auth-portal.yml
+    needs: Changes-Detector
+    if: needs.Changes-Detector.outputs.auth-portal == 'true'
+    uses: ./.github/workflows/auth-portal-deploy.yml
     secrets: inherit
-  # If any changes happened in Auth-Service then this job will runs
+
+  # 3. Auth Service Flow
   Auth-Service-Flow:
-    if: contains(github.event.head_commit.modified,'apps/micro-services/auth-service') || contains(github.event.head_commit.added,'apps/micro-services/auth-service')
-    uses: ./.github/workflows/auth-service.yml
+    needs: Changes-Detector
+    if: needs.Changes-Detector.outputs.auth-service == 'true'
+    uses: ./.github/workflows/auth-service-deploy.yml
     secrets: inherit
-
-
-
