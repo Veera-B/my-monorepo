@@ -1,0 +1,48 @@
+name: Auth Service Flow
+on:
+  workflow_call:
+
+jobs:
+  Initialization:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Code'
+        uses: actions/checkout@v4
+
+  Tag-Generation:
+    needs: Initialization
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.set-tag.outputs.TAG }}
+    steps:
+      - id: set-tag
+        run: echo "TAG=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+  Deployment:
+    needs: [Initialization, Tag-Generation]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Login to ACR'
+        uses: azure/docker-login@v2
+        with:
+          login-server: monorepodevacr.azurecr.io
+          username: ${{ secrets.AZURE_ACR_USERNAME }}
+          password: ${{ secrets.AZURE_ACR_PASSWORD }}
+
+      - name: 'Build and Push'
+        run: |
+          docker build -t monorepodevacr.azurecr.io/auth-service:${{ needs.Tag-Generation.outputs.tag }} -f apps/micro-services/auth-service/Dockerfile .
+          docker push monorepodevacr.azurecr.io/auth-service:${{ needs.Tag-Generation.outputs.tag }}
+          docker tag monorepodevacr.azurecr.io/auth-service:${{ needs.Tag-Generation.outputs.tag }} monorepodevacr.azurecr.io/auth-service:latest
+          docker push monorepodevacr.azurecr.io/auth-service:latest
+
+      - name: 'Azure Login'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
+
+      - name: 'Deploy to Web App'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'monodev' # ప్రస్తుతం ఒకే వెబ్ యాప్ వాడుతున్నావు కాబట్టి
+          images: monorepodevacr.azurecr.io/auth-service:latest
