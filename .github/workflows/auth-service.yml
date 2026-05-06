@@ -22,6 +22,8 @@ jobs:
     needs: [Initialization, Tag-Generation]
     runs-on: ubuntu-latest
     steps:
+      - name: 'Checkout Code' # <--- ఈ స్టెప్ ఖచ్చితంగా ఉండాలి
+        uses: actions/checkout@v4
       - name: 'Login to ACR'
         uses: azure/docker-login@v2
         with:
