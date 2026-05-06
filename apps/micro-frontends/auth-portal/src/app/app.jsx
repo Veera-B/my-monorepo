@@ -4,7 +4,7 @@ import NxWelcome from './nx-welcome';
 export function App() {
   return (
     <div>
-      <h3>Hello veera!</h3>
+      <h3>Hello!</h3>
       <NxWelcome title="@org/auth-portal" />
     </div>
   );

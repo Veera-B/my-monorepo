@@ -29,12 +29,12 @@ jobs:
   Auth-Portal-Flow:
     needs: Changes-Detector
     if: needs.Changes-Detector.outputs.auth-portal == 'true'
-    uses: ./.github/workflows/auth-portal-deploy.yml
+    uses: ./.github/workflows/auth-portal.yml
     secrets: inherit
 
   # 3. Auth Service Flow
   Auth-Service-Flow:
     needs: Changes-Detector
     if: needs.Changes-Detector.outputs.auth-service == 'true'
-    uses: ./.github/workflows/auth-service-deploy.yml
+    uses: ./.github/workflows/auth-service.yml
     secrets: inherit
