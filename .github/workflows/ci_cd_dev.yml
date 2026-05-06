@@ -10,12 +10,12 @@ jobs:
   # If any changes happened in Auth-Portal then this job will runs
   Auth-Portal-Flow:
     if: contains(github.event.head_commit.modified,'apps/micro-frontend/auth-portal') || contains(github.event.head_commit.added,'apps/micro-frontend/auth-portal')
-    uses: ./.github/workflows/auth-portal-dev.yml
+    uses: ./.github/workflows/auth-portal.yml
     secrets: inherit
   # If any changes happened in Auth-Service then this job will runs
   Auth-Service-Flow:
     if: contains(github.event.head_commit.modified,'apps/micro-services/auth-service') || contains(github.event.head_commit.added,'apps/micro-services/auth-service')
-    uses: ./.github/workflows/auth-service-dev.yml
+    uses: ./.github/workflows/auth-service.yml
     secrets: inherit
 
 
