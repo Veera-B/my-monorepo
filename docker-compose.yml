@@ -5,10 +5,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    # కొత్తగా యాడ్ చేసిన సెక్షన్
+    
     volumes:
       - ./apps/micro-services/auth-service:/app
-      # - /app/node_modules # ఒకవేళ ఫ్యూచర్‌లో నోడ్ వాడితే ఉపయోగపడుతుంది, పైథాన్‌కి ఇది ఆప్షనల్
+      
 
   auth-portal:
     build:
@@ -16,9 +16,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4200:4200"
-    # కొత్తగా యాడ్ చేసిన సెక్షన్
+  
     volumes:
       - ./apps/micro-frontends/auth-portal:/app
-      # కింద ఉన్నది చాలా ముఖ్యం: ఇది కంటైనర్ లోని node_modules ని 
-      # మీ లోకల్ ఫోల్డర్ తో ఓవర్ రైట్ అవ్వకుండా కాపాడుతుంది
+      
       - /app/node_modules
